@@ -40,10 +40,10 @@ public class HttpUtil {
 			int statusCode = response.getStatusLine().getStatusCode();
 			System.out.println("Status Code: "+statusCode);
 
-			Header[] headers = response.getAllHeaders();
+			/*Header[] headers = response.getAllHeaders();
 			for(Header header : headers){
 				System.out.println(header.getName()+" => "+header.getValue());
-			}
+			}*/
 			
 			BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 			StringBuilder sBuffer = new StringBuilder();
@@ -75,22 +75,50 @@ public class HttpUtil {
 		return responseObject;
 	}
 	
-	public static boolean sendGet(String uri){
+	public static ResponseObject sendGet(String uri, Header[] requestHeaders, List<NameValuePair> params){
+		ResponseObject responseObject = null;
 		try {
+			
+			responseObject = new ResponseObject();
+			
 			HttpClient client = HttpClientBuilder.create().build();
 			HttpGet get = new HttpGet(uri);
+			get.setHeaders(requestHeaders);
 			
 			HttpResponse response = client.execute(get);
-			Header[] headers = response.getAllHeaders();
+			/*Header[] headers = response.getAllHeaders();
 			for(Header header : headers){
 				System.out.println(header.getName()+" => "+header.getValue());
+			}*/
+			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+			StringBuilder sBuffer = new StringBuilder();
+			char[] cBuffer = new char[1];
+			while(reader.read(cBuffer, 0, 1) != -1){
+				sBuffer.append(cBuffer[0]);
 			}
+			String output = sBuffer.toString();
+			System.out.println("Output : "+output);
+			Map<String, Object> objectMap = null;
+			try {
+				Gson gson = new GsonBuilder().serializeNulls().create();
+				Type type = new TypeToken<Map<String, Object>>() {}.getType();
+				objectMap = gson.fromJson(output, type);
+			} catch (JsonSyntaxException e) {
+				e.printStackTrace();
+			}
+			
+			responseObject.setStatus(response.getStatusLine().getStatusCode());
+			responseObject.setMessage(response.getStatusLine().getReasonPhrase());
+			responseObject.setObj(objectMap);
+			reader.close();
+			
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return responseObject;
 	}
 	
 	public static class ResponseObject{

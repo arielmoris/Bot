@@ -115,37 +115,65 @@ public class TinderServiceImpl implements TinderService{
 	}
 
 	@Override
-	public boolean updateProfile(String auth_token, int age_filter_min,
-			int gender, int age_filter_max, int distance_filter) {
+	public boolean updateProfile(String auth_token, int age_filter_min, int gender, int age_filter_max, int distance_filter) {
 		return false;
 	}
 
 	@Override
-	public boolean reportUser(String auth_token, String id_to_report,
-			int cause_id) {
+	public boolean reportUser(String auth_token, String id_to_report, int cause_id) {
 		return false;
 	}
 
 	@Override
-	public boolean sendMessage(String auth_token, String receiver_id,
-			String message) {
-		return false;
+	public boolean sendMessage(String auth_token, String receiver_id, String message) {
+		boolean result = false;
+		
+		Header[] headers = prepareCommonHeader(auth_token);
+		List<NameValuePair> params = new ArrayList<>();
+		params.add(new BasicNameValuePair("message", message));
+		
+		System.out.println("Match_id :"+receiver_id);
+		ResponseObject responseObject = HttpUtil.sendGet("https://api.gotindaer.com/user/matches/"+receiver_id, headers, params);
+		if(responseObject != null){
+			if(responseObject.getStatus() == 200){
+				Map<String, Object> map = (Map<String, Object>) responseObject.getObj();
+			}else{
+				throw new RuntimeException("Error : "+responseObject.getStatus()+"=>"+responseObject.getMessage());
+			}
+		}else{
+			throw new RuntimeException("Response object is null");
+		}
+		return result;
 	}
 
 	@Override
 	public Map<String, Object> getUpdates(String auth_token) {
-		return null;
+		Map<String, Object> map = new HashMap<>();
+		Header[] headers = prepareCommonHeader(auth_token);
+		List<NameValuePair> params = new ArrayList<>();
+		
+		ResponseObject responseObject = HttpUtil.sendGet("https://api.gotindaer.com/updates", headers, params);
+		if(responseObject != null){
+			if(responseObject.getStatus() == 200){
+				map = (Map<String, Object>) responseObject.getObj();
+			}else{
+				throw new RuntimeException("Error : "+responseObject.getStatus()+"=>"+responseObject.getMessage());
+			}
+		}else{
+			throw new RuntimeException("Response object is null");
+		}
+		return map;
 	}
 
 	@Override
 	public boolean like(String auth_token, String match_id) {
-		
 		boolean result = false;
 		
 		Header[] headers = prepareCommonHeader(auth_token);
 		List<NameValuePair> params = new ArrayList<>();
 		
-		ResponseObject responseObject = HttpUtil.sendPost("https://api.gotinder.com/like/"+match_id, headers, params);
+		System.out.println("Match_id :"+match_id);
+		ResponseObject responseObject = HttpUtil.sendGet("https://api.gotinder.com/like/"+match_id, headers, params);
 		if(responseObject != null){
 			if(responseObject.getStatus() == 200){
 				Map<String, Object> map = (Map<String, Object>) responseObject.getObj();
@@ -161,7 +189,23 @@ public class TinderServiceImpl implements TinderService{
 
 	@Override
 	public boolean pass(String auth_token, String match_id) {
-		return false;
+		boolean result = false;
+		Header[] headers = prepareCommonHeader(auth_token);
+		List<NameValuePair> params = new ArrayList<>();
+		
+		System.out.println("Match_id :"+match_id);
+		ResponseObject responseObject = HttpUtil.sendGet("https://api.gotinder.com/pass/"+match_id, headers, params);
+		if(responseObject != null){
+			if(responseObject.getStatus() == 200){
+				Map<String, Object> map = (Map<String, Object>) responseObject.getObj();
+				result = Boolean.getBoolean((String)map.get("match_result"));
+			}else{
+				throw new RuntimeException("Error : "+responseObject.getStatus()+"=>"+responseObject.getMessage());
+			}
+		}else{
+			throw new RuntimeException("Response object is null");
+		}
+		return result;
 	}
 
 	@Override
@@ -171,7 +215,7 @@ public class TinderServiceImpl implements TinderService{
 		Header[] headers = prepareCommonHeader(auth_token);
 		List<NameValuePair> params = new ArrayList<>();
 		
-		ResponseObject responseObject = HttpUtil.sendPost("https://api.gotinder.com/user/recs", headers, params);
+		ResponseObject responseObject = HttpUtil.sendGet("https://api.gotinder.com/user/recs", headers, params);
 		if(responseObject != null){
 			if(responseObject.getStatus() == 200){
 				Map<String, Object> map = (Map<String, Object>) responseObject.getObj();

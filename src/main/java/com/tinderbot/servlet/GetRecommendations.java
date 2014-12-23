@@ -14,7 +14,9 @@ public class GetRecommendations {
 		List<Map<String, Object>> results = tinderService.getRecommendations(auth_token);
 		for(Map<String, Object> result : results){
 			String id = (String) result.get("_id");
-			tinderService.like(auth_token, id);
+			if(tinderService.like(auth_token, id)){
+				tinderService.sendMessage(auth_token, id, "Hi there!");
+			}
 		}
 	}
 }
