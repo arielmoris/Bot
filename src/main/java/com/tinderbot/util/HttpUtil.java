@@ -1,4 +1,4 @@
-package com.tinderbot.http;
+package com.tinderbot.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

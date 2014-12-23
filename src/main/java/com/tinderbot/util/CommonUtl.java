@@ -1,4 +1,4 @@
-package com.tinderbot.http;
+package com.tinderbot.util;
 
 import java.util.Iterator;
 import java.util.Map;

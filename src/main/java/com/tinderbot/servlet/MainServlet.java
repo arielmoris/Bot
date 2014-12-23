@@ -16,8 +16,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.tinderbot.http.HttpUtil;
-import com.tinderbot.http.HttpUtil.ResponseObject;
+import com.tinderbot.util.HttpUtil;
+import com.tinderbot.util.HttpUtil.ResponseObject;
 
 /**
  * Servlet implementation class MainServlet
